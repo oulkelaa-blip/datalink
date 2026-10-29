@@ -1,0 +1,47 @@
+schemaVersion: 2.2.2
+
+metadata:
+  name: mydlk
+
+attributes:
+  controller.devfile.io/storage-type: per-workspace
+
+components:
+  - name: runtime
+    container:
+      image: registry.redhat.io/devspaces/udi-rhel9:latest
+      mountSources: true
+
+      memoryRequest: 1Gi
+      memoryLimit: 2Gi
+      cpuRequest: "100m"
+      cpuLimit: "500m"
+
+      env:
+        - name: NODE_ENV
+          value: development
+        - name: CHOKIDAR_USEPOLLING
+          value: "true"
+        - name: WATCHPACK_POLLING
+          value: "true"
+        - name: NODE_OPTIONS
+          value: "--max-old-space-size=1536"
+
+      endpoints:
+        - name: front
+          exposure: public
+          protocol: https
+          targetPort: 4200
+
+        - name: back
+          exposure: public
+          protocol: https
+          targetPort: 5000
+
+      volumeMounts:
+        - name: npm-cache
+          path: /home/user/.npm
+
+  - name: npm-cache
+    volume:
+      size: 2Gi
